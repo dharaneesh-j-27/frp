@@ -1,29 +1,23 @@
+# Python virtual env / Conda
+Lib/
+Library/
+Scripts/
+Tools/
+include/
+libs/
+share/
+etc/
+conda-meta/
+
+# Windows binaries
+*.dll
+*.exe
+
+# Models & data
+*.pkl
+known_faces/
+unknown_faces/
+
 # Python cache
 __pycache__/
 *.pyc
-*.pdb
-
-# Conda / Python environment (DO NOT push)
-conda-meta/
-DLLs/
-etc/
-include/
-Lib/
-Library/
-libs/
-Scripts/
-share/
-Tools/
-
-# Executables & DLLs
-python.exe
-pythonw.exe
-*.dll
-
-# DeepFace models
-*.pkl
-*.h5
-
-# Face data
-known_faces/*
-unknown_faces/*
