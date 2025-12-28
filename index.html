@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-PASS ENTRY INTERFACE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6; /* A clean blue */
+            --secondary-color: #e5e7eb;
+            --background-color: #111827; /* Dark gray */
+            --panel-bg: #1f2937; /* Slightly lighter gray */
+            --border-color: #4b5563; /* Gray border */
+            --text-color: #d1d5db; /* Light gray text */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            gap: 2rem;
+            grid-template-columns: 1fr;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .panel {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .panel:hover {
+            transform: translateY(-5px);
+        }
+        
+        .header {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .main-header {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .sub-header {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        .input-field, .select-field {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #374151;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            transition: all 0.2s ease-in-out;
+            box-sizing: border-box;
+        }
+
+        .input-field:focus, .select-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        .cam-feed-container {
+            flex-grow: 1;
+            background-color: #000;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 250px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .cam-feed-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .button {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+        .button i {
+            font-size: 1.2rem;
+        }
+
+        #recordButton {
+            background-color: #ef4444; /* Red for record */
+            color: white;
+        }
+        #recordButton:hover:not(:disabled) {
+            background-color: #dc2626;
+            transform: translateY(-2px);
+        }
+        #recordButton:disabled {
+            background-color: #b91c1c;
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #submitButton {
+            background-color: var(--primary-color);
+            color: white;
+            margin-top: 1.5rem;
+        }
+        #submitButton:hover:not(:disabled) {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+        }
+        #submitButton:disabled {
+            background-color: #1e40af;
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            width: 1rem;
+            height: 1rem;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #log-message {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1 class="main-header">E-PASS MANAGEMENT SYSTEM</h1>
+        <p class="text-color">Secure Entry Protocol - Alpha v2.1</p>
+    </header>
+
+    <main class="container">
+        <div class="panel">
+            <h2 class="sub-header">Applicant Data</h2>
+            <form id="epass-form">
+                <div class="form-group">
+                    <label for="name" class="label">Full Name</label>
+                    <input type="text" id="name" class="input-field" placeholder="John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label for="dob" class="label">Date of Birth</label>
+                    <input type="date" id="dob" class="input-field" required>
+                </div>
+                <div class="form-group">
+                    <label for="nationality" class="label">Nationality</label>
+                    <select id="nationality" class="select-field" required>
+                        <option value="">Select Country</option>
+                        <option value="india">India</option>
+                        <option value="usa">USA</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div id="id-container" class="form-group">
+                    </div>
+                <div class="form-group">
+                    <label for="purpose" class="label">Purpose of Visit</label>
+                    <input type="text" id="purpose" class="input-field" placeholder="Official Business, Tourism, etc." required>
+                </div>
+                <div class="form-group">
+                    <label for="mobileNumber" class="label">Mobile Number</label>
+                    <input type="tel" id="mobileNumber" class="input-field" placeholder="+91 9876543210" required>
+                </div>
+            </form>
+        </div>
+
+        <div class="panel">
+            <h2 class="sub-header">Face Recognition Capture</h2>
+            <div class="cam-feed-container">
+                <p id="cam-status" class="text-color">Camera Feed Offline</p>
+                <video id="videoPreview" autoplay playsinline muted class="hidden"></video>
+                <canvas id="snapshotCanvas" class="hidden"></canvas>
+            </div>
+            
+            <p id="log-message">Ready to record. Please look at the camera.</p>
+
+            <button id="recordButton" class="button">
+                <i class="fa-solid fa-video"></i> Start Recording
+            </button>
+
+            <button id="submitButton" class="button" disabled>
+                <i class="fa-solid fa-cloud-arrow-up"></i> Submit Data
+            </button>
+        </div>
+    </main>
+
+    <div id="modal" class="hidden">
+        <div class="panel" style="max-width: 400px; text-align: center;">
+            <h3 id="modal-title" class="sub-header"></h3>
+            <p id="modal-message"></p>
+            <button id="modal-close-button" class="button" style="background-color: var(--primary-color);">OK</button>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById("videoPreview");
+        const snapshotCanvas = document.getElementById("snapshotCanvas");
+        const recordButton = document.getElementById("recordButton");
+        const submitButton = document.getElementById("submitButton");
+        const logMessage = document.getElementById("log-message");
+        const camStatus = document.getElementById("cam-status");
+        const nationalitySelect = document.getElementById("nationality");
+        const idContainer = document.getElementById("id-container");
+        const epassForm = document.getElementById("epass-form");
+        
+        // Modal elements
+        const modal = document.getElementById("modal");
+        const modalTitle = document.getElementById("modal-title");
+        const modalMessage = document.getElementById("modal-message");
+        const modalCloseButton = document.getElementById("modal-close-button");
+
+        let mediaStream = null;
+        let recording = false;
+        let frames = [];
+        let captureIntervalId = null;
+        
+        const TOTAL_FRAMES = 5;
+        const RECORDING_DURATION_MS = 2000;
+        const INTERVAL_MS = RECORDING_DURATION_MS / TOTAL_FRAMES;
+
+        // Custom Modal Function
+        function showModal(title, message) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            modal.style.display = 'flex';
+            modal.style.position = 'fixed';
+            modal.style.top = 0;
+            modal.style.left = 0;
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+            modal.style.alignItems = 'center';
+            modal.style.justifyContent = 'center';
+        }
+
+        modalCloseButton.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // Function to update Aadhar/Passport field based on nationality
+        function updateIDField() {
+            const nationality = nationalitySelect.value.trim().toLowerCase();
+            idContainer.innerHTML = '';
+            
+            if (nationality === "india") {
+                idContainer.innerHTML = `
+                    <label for="aadharNo" class="label">Aadhar No.</label>
+                    <input type="text" id="aadharNo" class="input-field" placeholder="12-digit Aadhar number" required>
+                `;
+            } else if (nationality === "usa") {
+                idContainer.innerHTML = `
+                    <label for="passportNo" class="label">Passport No.</label>
+                    <input type="text" id="passportNo" class="input-field" placeholder="Passport number" required>
+                `;
+            }
+        }
+
+        async function startCamera() {
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                video.srcObject = mediaStream;
+                video.onloadedmetadata = () => {
+                    video.play();
+                    video.classList.remove('hidden');
+                    camStatus.classList.add('hidden');
+                };
+                logMessage.textContent = "Camera is live. Ready to record.";
+            } catch (err) {
+                showModal("Camera Error", "Unable to access camera. Please check permissions.");
+                console.error("Error accessing camera:", err);
+                camStatus.textContent = "Camera Unavailable";
+                recordButton.disabled = true;
+            }
+        }
+
+        function captureFrame() {
+            if (!recording || !mediaStream) return;
+
+            const context = snapshotCanvas.getContext("2d");
+            snapshotCanvas.width = video.videoWidth;
+            snapshotCanvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+            const dataURL = snapshotCanvas.toDataURL("image/jpeg");
+            frames.push(dataURL);
+            
+            logMessage.textContent = `Captured frame ${frames.length} of ${TOTAL_FRAMES}...`;
+
+            if (frames.length >= TOTAL_FRAMES) {
+                stopRecording();
+            }
+        }
+
+        function startRecording() {
+            if (recording || !mediaStream) return;
+
+            recording = true;
+            frames = [];
+            recordButton.innerHTML = `<span class="spinner"></span> Recording...`;
+            recordButton.disabled = true;
+            submitButton.disabled = true;
+            logMessage.textContent = `Recording started. Please remain still...`;
+
+            captureIntervalId = setInterval(captureFrame, INTERVAL_MS);
+        }
+
+        function stopRecording() {
+            if (!recording) return;
+
+            clearInterval(captureIntervalId);
+            recording = false;
+            recordButton.innerHTML = `<i class="fa-solid fa-video"></i> Start Recording`;
+            recordButton.disabled = false;
+            logMessage.textContent = `Recording complete. Captured ${frames.length} frames.`;
+            submitButton.disabled = false;
+        }
+
+        function validateAndDownload() {
+            if (!epassForm.checkValidity()) {
+                showModal("Validation Error", "Please fill in all the required fields before submitting.");
+                return;
+            }
+
+            if (frames.length < TOTAL_FRAMES) {
+                showModal("Incomplete Capture", "Please record the full video before submitting.");
+                return;
+            }
+            
+            const idNumber = document.getElementById("aadharNo")?.value || document.getElementById("passportNo")?.value;
+            if (!idNumber) {
+                showModal("ID Missing", "Please enter a valid Aadhar or Passport number.");
+                return;
+            }
+
+            const name = document.getElementById("name").value;
+            const dob = document.getElementById("dob").value;
+            const nationality = nationalitySelect.value;
+            const purpose = document.getElementById("purpose").value;
+            const mobileNumber = document.getElementById("mobileNumber").value;
+            const aadharNo = document.getElementById("aadharNo")?.value || '';
+            const passportNo = document.getElementById("passportNo")?.value || '';
+
+            // Download images first
+            frames.forEach((dataURL, index) => {
+                const imgLink = document.createElement("a");
+                imgLink.href = dataURL;
+                imgLink.download = `${idNumber}-frame-${index + 1}.png`;
+                document.body.appendChild(imgLink);
+                imgLink.click();
+                document.body.removeChild(imgLink);
+            });
+
+            // Prepare and download CSV
+            const csvData = `Name,DOB,Nationality,Purpose,Aadhar Number,Passport Number,Mobile Number\n"${name}","${dob}","${nationality}","${purpose}","${aadharNo}","${passportNo}","${mobileNumber}"`;
+            const csvBlob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+            const csvLink = document.createElement("a");
+            csvLink.href = URL.createObjectURL(csvBlob);
+            csvLink.download = `${idNumber}-epass-details.csv`;
+            document.body.appendChild(csvLink);
+            csvLink.click();
+            document.body.removeChild(csvLink);
+
+            showModal("Submission Successful", "E-PASS data and images have been saved locally.");
+            resetForm();
+        }
+
+        function resetForm() {
+            epassForm.reset();
+            frames = [];
+            logMessage.textContent = "Ready to record. Please look at the camera.";
+            submitButton.disabled = true;
+            updateIDField();
+        }
+
+        nationalitySelect.addEventListener("change", updateIDField);
+        recordButton.addEventListener("click", () => {
+            // First time, start camera. Subsequent times, start recording.
+            if (!mediaStream) {
+                startCamera().then(() => {
+                    if (mediaStream) {
+                        startRecording();
+                    }
+                });
+            } else {
+                startRecording();
+            }
+        });
+        submitButton.addEventListener("click", validateAndDownload);
+
+        // Initial setup on page load
+        window.onload = () => {
+            updateIDField();
+            startCamera();
+        };
+    </script>
+</body>
+</html>
